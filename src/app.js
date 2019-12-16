@@ -32,10 +32,6 @@ const users = [
 	},
 ];
 
-app.get("/", (req, res) => {
-	res.send("a GET request");
-});
-
 app.post("/user", (req, res) => {
 	// get the data
 	const { username, password, favoriteClub, newsLetter = false } = req.body;
@@ -93,7 +89,25 @@ app.post("/user", (req, res) => {
 	users.push(newUser);
 
 	// at this point all validation passed
-	res.send("All validation passed");
+	// res.send("All validation passed");
+	res.status(201).location(`http://localhost:8000/user/${id}`).json(newUser);
+});
+
+app.delete("/user/:userId", (req, res) => {
+	const { userId } = req.params;
+
+	const index = users.findIndex((u) => u.id === userId);
+
+	if (index === -1) {
+		return res.status(400).send("User not found");
+	}
+	users.splice(index, 1);
+
+	res.status(204).end();
+});
+
+app.get("/user", (req, res) => {
+	res.json(users);
 });
 
 app.use(function errorHandler(error, req, res, next) {
